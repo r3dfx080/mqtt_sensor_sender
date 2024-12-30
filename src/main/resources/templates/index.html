@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кнопки с действиями</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>Выберите действие</h1>
+    <div class="button-container">
+        <button onclick="sendAction('action1')">Начать отправку (1 в 10мин)</button>
+        <button onclick="sendAction('action2')">Внеочередная отправка</button>
+    </div>
+</div>
+
+<script>
+    function sendAction(action) {
+        fetch(`/${action}`, {
+            method: 'POST'
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            } else {
+                throw new Error('Ошибка выполнения действия');
+            }
+        })
+        .then(message => alert(message))
+        .catch(error => alert(error.message));
+    }
+</script>
+</body>
+</html>
