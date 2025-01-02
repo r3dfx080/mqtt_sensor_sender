@@ -1,0 +1,5 @@
+ssl://mqtt.cloud.yandex.net:8883
+are9rm069vi0c870o04h
+areu6kmlsavjq6qnkpg2
+B3NMfVZeS_9eNPp
+-

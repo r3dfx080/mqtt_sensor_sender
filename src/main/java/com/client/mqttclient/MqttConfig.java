@@ -1,6 +1,5 @@
 package com.client.mqttclient;
 
-import jakarta.annotation.PreDestroy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -11,26 +10,34 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Scanner;
 
 @Configuration
 public class MqttConfig {
-    private static final String BROKER_URL = "tcp://mqtt.cloud.yandex.net:883";
-    private static final String CLIENT_ID = "SensorDataPublisher";
+    private static final String filename = "your/path/here/mqttconfig.txt";
 
-    private static final String login = "gimme your password";
-    private static final String password = "OralCumshot";
+    private static  String registryURL;
+    private static  String clientId;
 
-    private static final String TRUSTED_ROOT = "";
+    private static  String login;
+    private static  String password;
+
+    private static  String TRUSTED_ROOT;
 
     @Bean
     public MqttClient mqttClient() {
+
+        readConfig();
+
         try {
-            MqttClient client = new MqttClient(BROKER_URL, CLIENT_ID);
+            MqttClient client = new MqttClient(registryURL, clientId);
             MqttConnectOptions options = new MqttConnectOptions();
 
             options.setUserName(login);
@@ -48,6 +55,18 @@ public class MqttConfig {
         }
     }
 
+    private void readConfig(){
+        File file = new File(filename);
+        try (Scanner scan = new Scanner(file)) {
+            registryURL = scan.nextLine().trim();
+            clientId = scan.nextLine().trim();
+            login = scan.nextLine().trim();
+            password = scan.nextLine().trim();
+            TRUSTED_ROOT = scan.nextLine().trim();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("File reading error", e);
+        }
+    }
 
     //Загружаем сертификат удостоверяющего центра из статической переменной `TRUSTED_ROOT`.
     // Copied from Yandex IoT Core Java
