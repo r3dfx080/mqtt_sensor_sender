@@ -25,8 +25,13 @@ public class MainController {
     }
 
     @PostMapping("/action1")
-    public String publishMessage(@RequestParam String topic) {
-        mqttService.publishMessage();
+    public String publishMessage(@RequestParam String topic)  {
+        Runnable eternalSending = () -> {
+            try {
+                mqttService.eternalPublishMessage();
+            } catch (InterruptedException e) {throw new RuntimeException(e);}
+        };
+        new Thread(eternalSending).start();
         return "Message published to topic: " + topic;
     }
 
@@ -36,5 +41,5 @@ public class MainController {
         return "Message published to topic: " + topic;
     }
 
-    //Ставим на поток publishMessage + добавляем Рандом + меняем параметры (топик, юрл)
+
 }

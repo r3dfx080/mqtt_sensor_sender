@@ -1,26 +1,34 @@
 package com.client.mqttclient;
 
+import jakarta.annotation.PreDestroy;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.stereotype.Service;
 
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class MqttService {
     private final MqttClient mqttClient;
 
+    //private String payload;
+    private int numPayload = 0;
+
     public MqttService(MqttClient mqttClient) {
         this.mqttClient = mqttClient;
     }
 
     public void publishMessage() {
-        String payload = "18";
+
+        numPayload = randomTemperature();
+        byte[] payload = ByteBuffer.allocate(4).putInt(numPayload).array();
         String topic = "some shit idk";
         try {
-            MqttMessage message = new MqttMessage(payload.getBytes());
+            MqttMessage message = new MqttMessage(payload);
             message.setQos(1); // QoS 1 для гарантированной доставки
             mqttClient.publish(topic, message);
             System.out.println("Message published to topic: " + topic);
@@ -40,6 +48,11 @@ public class MqttService {
 
 
         }
+    }
+
+    private int randomTemperature(){
+        Random rnd = new Random();
+        return  20 + rnd.nextInt(40); //20-60 C bound
     }
 
 
